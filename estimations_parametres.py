@@ -54,75 +54,18 @@ import cma
 data_witz = pd.read_csv('Fig1_2_3.csv', header = None) 
 [Lb, dL, Li, Li_prev, dLambda_if, lambda_inv, Tid, dLambda_id, Lb_mother, condition] = range(0, 10)
 
-def fig_DIAM_faux(data_or_cdt, author):
-    [v, V, v_tild, C, lamb] = extract_donnees2(data_or_cdt, author)
-    v = v.flatten()
-    binn = np.linspace(0, 5, 100)
-    C = C.flatten()
-    v_tild = v_tild.flatten()
-    lamb = lamb.flatten()
-    vexp = v_tild#*np.exp(C*lamb)
-    vexp = vexp.flatten()
-    plt.hist(v, binn, color = 'k', alpha = 0.5, density = True, label = '$\Delta_d$')
-    plt.hist(vexp, binn, color = 'r', alpha = 0.5, density = True, label = '$\Delta_i$') 
 
-def correl_Cperiod(data, color, windsize):
-    I = adder_init(data)
-    lamb1 = I[3].astype(float).flatten()
-    lamb2 = I[4].astype(float).flatten()
-    C1 = I[6].astype(float).flatten()/60.
-    C2 = I[7].astype(float).flatten()/60.
-    plot_binned_data(windsize, np.exp(lamb1*C1), np.exp(lamb2*C2), color)
+
     
-def correl_Cperiod_Vi(data, color, windsize):
-    C = data[1:, data[0] == 'C period (minute)'].astype(float)/60.
-    Ld = data[1:, data[0] == 'division size (micron)'].astype(float)
-    Lb = data[1:, data[0] == 'newborn size (micron)'].astype(float)
-    Td = data[1:, data[0] == 'generation time (minute)'].astype(float)/60.
-    Li = data[1:, data[0] == 'initiation size per ori (micron)'].astype(float)/2.
-    Lrt = Li*(Ld/Lb)**(C/Td)
-    plot_binned_data(windsize, Li, Lrt - Li, color)
+
+
+
+
+
     
-def correl_Cperiod_Vi_tiru(data, color, windsize):
-    Lri = data[1:, data[0] == 'Lri'].astype(float)
-    Tri = data[1:, data[0] == 'Tri'].astype(float)
-    Trt = data[1:, data[0] == 'Trt'].astype(float)
-    Td = data[1:, data[0] == 'Td'].astype(float)
-    Ld = data[1:, data[0] == 'Ld'].astype(float)
-    Lb = data[1:, data[0] == 'Lb'].astype(float)
-    lamb = np.log(Ld/Lb)/Td
-    Lrt = Lri*(Ld/Lb)**((Trt - Tri)/Td)
-    #Lrt = data[1:, data[0] == 'Lrt'].astype(float)
-    Li = data[1:, data[0] == 'Lri'].astype(float)/2.
-    plot_binned_data(windsize, Li, Lrt - Li, color)
-
-
-def test_si(data):
-    lamb = data[1:, data[0] == 'elongation rate (1/hour)'].astype(float)
-    Delta_d = data[1:, data[0] == 'added size (micron)'].astype(float)
-    plt.plot(lamb, Delta_d, 'k.', alpha = 0.2)
-    
-def test_tirudavi(data):
-    Lri = data[1:, data[0] == 'Lri'].astype(float)
-    Lrt = data[1:, data[0] == 'Lrt'].astype(float)
-    Tri = data[1:, data[0] == 'Tri'].astype(float)
-    Trt = data[1:, data[0] == 'Trt'].astype(float)
-    Td = data[1:, data[0] == 'Td'].astype(float)
-    Ld = data[1:, data[0] == 'Ld'].astype(float)
-    Lb = data[1:, data[0] == 'Lb'].astype(float)
-    Delta_d = Ld - Lb
-    lamb = np.log(Ld/Lb)/Td
-    Lrtpred = Lri*(Ld/Lb)**((Trt - Tri)/Td)
-    plt.plot(lamb, Delta_d, 'k.', alpha = 0.1)
-    #plt.plot(Lrt, Lrtpred, 'b.')
-    #plt.hist(lamb, [2*moy_lamb*i/100 for i in range(100)])
 
 
 
-
-def plot_vi_for_figure(data, author):
-    [vb_1, vi_1, vi_2] = extract_donnees4(data, author)
-    plt.hist(vi_1, [0.02*k for k in range(50)], color = 'darkslategray')
 
 def extract_donnees(data_or_cdt, author):
     if author == 'si':
@@ -233,26 +176,6 @@ def figure_overlap_Dd_Di(data_or_cdt, author):
     plt.xlabel("$Size$ ($\mu m$)")
     
 
-def MnteCarlo_proba_DIAM(data_or_cdt, author):
-    [Delta_d, Delta_i] = extract_donnees32(data_or_cdt, author)
-    n = 1000000
-    Vb = np.random.choice(Delta_d, size = n)
-    Vi = np.random.choice(Delta_i, size = n)
-    for loop in range(100):
-        Vb = (Vb + np.random.choice(Delta_d, size = n))/2.
-        Vi = (Vi + np.random.choice(Delta_i, size = n))/2.
-    Vb = np.reshape(Vb, (1, n))
-    Vi = np.reshape(Vi, (1, n))
-    Vb = np.concatenate((Vb, np.ones((1, n))), axis = 0)
-    Vi = np.concatenate((Vi, np.zeros((1, n))), axis = 0)
-    Total = np.concatenate((Vb, Vi), axis = 1)
-    i = np.argsort(Total[0])
-    Total = Total[:,i]
-    s = np.sum(np.arange(1, 2*n + 1)*Total[1])
-    plt.hist(Vb[0], [0.01*k for k in range(400)], color = 'b', density = True, alpha = 0.5)
-    plt.hist(Vi[0], [0.01*k for k in range(400)], color = 'k', density = True, alpha = 0.5)
-    return 1 + n*(n+1)/(2 * n**2) - s/n**2 # Wilcoxon strategy
-
 def extract_donnees4(data_or_cdt, author):
     if author == 'si':
         data = select_data_si_seq_vi(data_or_cdt)
@@ -274,122 +197,43 @@ def extract_donnees4(data_or_cdt, author):
         vb_1 = data[:, Lb_mother]
         return [vb_1, vi_1, vi_2]
 
-
-
-# def graph_figure2(author, wind_size):
-#     #D = [data_si_mops_glu12aa, data_si_mops_glu2, data_si_mops_arg]
-#     D = [data_si_mops_glu1, data_si_mops_gly11aa, data_si_mops_acet]
-#     #C = ['darkcyan', 'slateblue', 'k']
-#     C = ['mediumaquamarine', 'palevioletred', 'midnightblue']
-#     for i in range(3):
-#         correl_Cperiod_Vi(D[i], C[i], wind_size)
-        #correl_Cperiod(D[i], C[i], wind_size)
-        # [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(D[i], 'si')
-    
-        # Delta_app = Delta_app.flatten()
-        # v = v.flatten()
-    
-        # plot_binned_data(wind_size, v, Delta_app, C[i])
         
-def graph_figure_letsee(wind_size):
-    D = [data_si_mops_glu12aa, data_si_mops_glu2, data_si_mops_arg]
-    #D = [data_si_mops_glu1, data_si_mops_gly11aa, data_si_mops_acet]
-    C = ['darkcyan', 'slateblue', 'k']
-    #C = ['mediumaquamarine', 'palevioletred', 'midnightblue']
-    for i in range(3):
-        [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(D[i], 'si')
     
-        v = V.flatten()/2.
-        lamb = lamb.flatten()
-
-        plot_binned_data(wind_size, lamb, v, C[i])
-    
-def graph_figure_vhat(wind_size):
-    #D = [data_si_mops_glu12aa, data_si_mops_glu2, data_si_mops_arg]
-    D = [data_si_mops_glu1, data_si_mops_gly11aa, data_si_mops_acet]
-    Color = ['darkcyan', 'slateblue', 'k']
-    #C = ['mediumaquamarine', 'palevioletred', 'midnightblue']
-    for i in range(3):
-        [v, V, v_tild, C, lamb] = extract_donnees2(D[i], 'si')
-        v_hat = v_tild*np.exp(lamb*C)
-        plot_binned_data(wind_size, v_tild, v_hat-v_tild, Color[i])
-        #plt.plot(v_tild, v_tild*np.exp(np.mean(C*lamb)),Color[i])
-
-
-def graph_figure_vhat2(wind_size):
-    D = [data_Tiruvadi_JM85_GluCas, data_Tiruvadi_JM85_Gly]
-    #D = [data_Tiruvadi_STK13_Ace, data_Tiruvadi_STK13_AlaTrE, data_Tiruvadi_STK13_Glu, data_Tiruvadi_STK13_Gly, data_Tiruvadi_STK13_GlyCas, data_Tiruvadi_STK13_GlyTrE]
-
-    Color = ['darkcyan', 'slateblue']
-    #Color = ['mediumaquamarine', 'palevioletred', 'midnightblue', 'k', 'darkred', 'green']
-    for i in range(2):
-        [v, V, v_tild, C, lamb] = extract_donnees2(D[i], 'tiru')
-        v_hat = v_tild*np.exp(lamb*C)
-        #plt.scatter(x = v_tild, y = C, color = Color[i], alpha = 0.5)
-        plot_binned_data(wind_size, v_tild, C, Color[i])
-        #plt.plot(v_tild, v_tild*np.exp(np.mean(C*lamb)),Color[i])
+def MnteCarlo_proba_DIAM(data_or_cdt, author):
+    [Delta_d, Delta_i] = extract_donnees32(data_or_cdt, author)
+    n = 1000000
+    Vb = np.random.choice(Delta_d, size = n)
+    Vi = np.random.choice(Delta_i, size = n)
+    for loop in range(100):
+        Vb = (Vb + np.random.choice(Delta_d, size = n))/2.
+        Vi = (Vi + np.random.choice(Delta_i, size = n))/2.
+    Vb = np.reshape(Vb, (1, n))
+    Vi = np.reshape(Vi, (1, n))
+    Vb = np.concatenate((Vb, np.ones((1, n))), axis = 0)
+    Vi = np.concatenate((Vi, np.zeros((1, n))), axis = 0)
+    Total = np.concatenate((Vb, Vi), axis = 1)
+    i = np.argsort(Total[0])
+    Total = Total[:,i]
+    s = np.sum(np.arange(1, 2*n + 1)*Total[1])
+    plt.hist(Vb[0], [0.01*k for k in range(400)], color = 'b', density = True, alpha = 0.5)
+    plt.hist(Vi[0], [0.01*k for k in range(400)], color = 'k', density = True, alpha = 0.5)
+    return 1 + n*(n+1)/(2 * n**2) - s/n**2 # Wilcoxon strategy
 
 
-#def plot_binned_data(x_interval_size, X, Y, color):
-def plot_binned_data(x_interval_size, X, Y, color, ax):
-    # Calculate the number of bins
-    num_bins = int(np.ceil((max(X) - min(X)) / x_interval_size))
-    
-    # Create empty lists to store binned X and Y values
-    binned_X = []
-    binned_Y = []
-    conf_intervals = []
-    
-    # Bin the data
-    for i in range(num_bins):
-        # Calculate bin edges
-        bin_start = min(X) + i * x_interval_size
-        bin_end = min(X) + (i + 1) * x_interval_size
-        bin_indices = np.where((X >= bin_start) & (X < bin_end))[0]
-        bin_X = X[bin_indices]
-        bin_Y = Y[bin_indices]
-        bin_center = (bin_start + bin_end) / 2
-        bin_mean_Y = np.mean(bin_Y)
-        if len(bin_Y) > 2:
-            std_err = np.std(bin_Y) / np.sqrt(len(bin_Y) - 1)
-            t_score = stats.t.ppf(0.975, len(bin_Y) - 1)
-            conf_interval = t_score * std_err
-            binned_X.append(bin_center)
-            binned_Y.append(bin_mean_Y)
-            conf_intervals.append(conf_interval)
-    
-    # Plot the binned data with confidence intervals
-    ax.errorbar(binned_X, binned_Y, color = color, yerr=conf_intervals, fmt='o', capsize=2)
-    #plt.errorbar(binned_X, binned_Y, color = color, yerr=conf_intervals, fmt='o', capsize=2)
-    # plt.ylim(0, 4)
-    plt.xlim(0.3, 1.3)
+def estim_proba_Tbdecroiss_empir(data_or_cdt, author):
+    [Delta_id, Delta_i] = extract_donnees3(data_or_cdt, author)
+    Delta_id = Delta_id.flatten().astype(float)
+    Delta_i = Delta_i.flatten().astype(float)
+    cpt = 0
+    N_id = np.size(Delta_id)
+    N_i = np.size(Delta_i)
+    for d_id1 in Delta_id:
+        for d_id2 in Delta_id:
+            for d_i in Delta_i:
+                if 2*d_id1 + d_i < d_id2:
+                    cpt += 1
+    return [cpt/(N_id*N_id*N_i), N_id, N_i]
 
-    
-
-
-def Delta_init_si(data):
-    I = adder_init(data)
-    y = I[1] - I[0]/2.
-    y = y.astype(float)
-    N = np.size(y)
-    kde = stats.gaussian_kde(y)
-    moy_i = np.mean(y)
-    D = np.linspace(0, 2*moy_i, 100)
-    #a,c,_,scale = stats.gengamma.fit(y, floc = 0)
-    taux = []
-    cum = np.arange(N)/float(N)
-    supp_rep = np.sort(y)
-    def hill(X):
-        [a, b] = X
-        return np.sum((cum - 1 + b/(b + supp_rep**a))**2)
-    results = minimize(hill, [2, 2])
-    [a, b] = results.x
-    for d in D:
-        taux.append(kde(d)*np.size(y)/max([1, np.sum(y[y > d])]))
-    #plt.hist(y,[2*k*moy_i/50. for k in range(50)], color = 'k', density = True)
-    plt.plot(D, a*D**(a-1)/(D**a + b), 'b')
-    plt.plot(D, taux, 'r')
-    return [a, b]
 
 def estim_param_AND(data_or_cdt, author):
     [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(data_or_cdt, author)
@@ -463,40 +307,6 @@ def likelihhod_revolution(law_Delta_d, law_Delta_id):
     for i in range(len(DATA)):
         print(estim_param_revolution_test_densites(DATA[i],AUTHOR[i], law_Delta_d, law_Delta_id))
     
-    
-# results_lognorm_gamma = np.array([[np.array([2.13621535e+01, 4.91512421e-45, 2.18530630e+01, 2.34310584e-02]), -310.3891263620018]
-# [np.array([3.92717948e-02, 1.07617791e+00, 3.00734402e+01, 2.36898684e-02]), -133.7179704179678]
-# [np.array([3.69172944e-01, 1.28241905e+00, 5.50273783e+01, 1.39478414e-02]), -850.4024319611824]
-# [np.array([2.59224270e+01, 9.26924120e-41, 3.30103892e+01, 2.92010480e-02]), -154.2686180013758]
-# [np.array([3.98284793e+01, 3.09161519e-40, 2.21340037e+01, 3.74683599e-02]), -81.32480562312544]
-# [np.array([1.56525999e-01, 1.27725910e+00, 3.16653114e+01, 2.50124089e-02]), -237.39846854597684]
-# [np.array([1.89650971e+01, 1.61222359e-38, 2.74189312e+01, 3.89601886e-02]), -50.82005559159789]
-# [np.array([4.61786319e+01, 2.81076056e-85, 3.28031839e+01, 1.80004382e-02]), -1530.0532856707684]
-# [np.array([3.97815802e+01, 5.83946270e-45, 2.66410376e+01, 2.89707717e-02]), -439.8176658253809]
-# [np.array([1.21245967e+01, 6.73087218e-41, 1.61465046e+01, 8.20067261e-02]), 83.01039464582013]
-# [np.array([ 0.2687051 ,  2.25140523, 32.06668398,  0.04080255]), 182.1758987628864]
-# [np.array([2.48288353e+01, 1.86574105e-45, 1.60884151e+01, 6.35634093e-02]), -6.876438026534418]
-# [np.array([2.96034788e+00, 3.91736634e-03, 4.22447926e+01, 3.67199943e-02]), 147.08102802920544]
-# [np.array([1.83970409e+01, 2.33278400e-43, 2.16586028e+01, 6.25105250e-02]), 155.84476702355923]
-# [np.array([4.07379159e+01, 6.30645405e-51, 5.34540823e+01, 2.19462314e-02]), -599.359523584834]
-# [np.array([3.14751610e+01, 1.03843971e-35, 5.67767037e+01, 3.89657280e-02]), 262.0435064692421]])
-
-# results_gamma_gamma = np.array([[np.array([23.43588662,  0.04282503, 17.29954109,  0.02860126]), -317.33700177692054]
-# [np.array([6.46232639e+02, 1.66660397e-03, 3.00729714e+01, 2.36902024e-02]), -133.71651659864563]
-# [np.array([5.13916325e+00, 2.54332183e-01, 5.60879387e+01, 1.37183693e-02]), -839.1464366361924]
-# [np.array([1.29215137e+01, 1.15232294e-01, 3.49764945e+01, 2.56463568e-02]), -178.64503465890297]
-# [np.array([1.94840741e+01, 8.68525964e-02, 5.63223388e+04, 6.38965767e-07]), -100.38706694394523]
-# [np.array([4.11576310e+01, 3.13745650e-02, 3.12682958e+01, 2.53469282e-02]), -237.52359166773675]
-# [np.array([12.13906679,  0.12330347, 25.16389353,  0.03784704]), -64.12181559340718]
-# [np.array([3.39336852e+01, 3.77914352e-02, 2.94464736e+01, 1.83660872e-02]), -1633.7649172141735]
-# [np.array([3.62535316e+01, 4.31586893e-02, 2.61313377e+01, 2.67508406e-02]), -541.5761314276934]
-# [np.array([1.22214341e+01, 1.60151079e-01, 3.95993404e+01, 2.09878495e-02]), 24.170469917976675]
-# [np.array([26.71591261,  0.08349488,  6.19451014,  0.20046123]), 164.7208106424252]
-# [np.array([25.03300573,  0.07371696,  9.06604993,  0.08010159]), -269.0583129254156]
-# [np.array([29.27786542,  0.07043374, 11.50173012,  0.10986707]), -140.98055403025344]
-# [np.array([15.14886153,  0.14116236, 24.28596857,  0.04541265]), -14.408257648721687]
-# [np.array([2.97562996e+01, 6.05761712e-02, 5.39607992e+01, 1.87324051e-02]), -765.698235935625]
-# [np.array([2.74733338e+01, 9.93659012e-02, 6.85951375e+01, 2.65701471e-02]), -15.594350130773291]])
 
 def figure_simu_CPM(data_or_cdt, author, nb_sim, alpha):
     [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(data_or_cdt, author)
@@ -1212,36 +1022,6 @@ def wasserstein_distance(X, Y):
     weights_Y = np.ones(n_Y) / n_Y
     return ot.emd2(weights_X, weights_Y, cost_matrix)
 
-def funct_rep1(vb, Xvb):
-    nvb = np.size(Xvb)
-    N = np.size(vb)
-    F = np.zeros(nvb)
-    for i in range(nvb):
-        cond_vb = np.where(vb < Xvb[i], 1, 0)
-        F[i] = np.sum(cond_vb)/float(N)
-    return F
-
-
-def funct_rep(vb, vi, Xvb, Xvi):
-    nvb = np.size(Xvb)
-    nvi = np.size(Xvi)
-    N = np.size(vb)
-    F = np.zeros((nvb, nvi))
-    for i in range(nvb):
-        for j in range(nvi):
-            cond_vb = np.where(vb < Xvb[i], 1, 0)
-            cond_vi = np.where(vi < Xvi[j], 1, 0)
-            F[i, j] = np.sum(cond_vi*cond_vb)/float(N)
-    return F
-
-def funct_rep2(vb, Nsub, Xvb):
-    nvb = np.size(Xvb)
-    F = np.zeros((4, nvb))
-    for i in range(4):
-        for j in range(nvb):
-            cond_vb = np.where(vb[Nsub*i : Nsub*(i+1)] < Xvb[j], 1, 0)
-            F[i, j] = np.sum(cond_vb)/float(Nsub)
-    return F
 
 def test_estim_param_AND(data_or_cdt, author):
     [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(data_or_cdt, author)
@@ -1393,17 +1173,6 @@ def select_data_si_seq_vi(data):
     return new_data
 
 
-def test_funct_select(data):
-    new_data = select_data_si_seq_vi(data)
-    print(new_data)
-    [taille_init_1, taille_init_2, Delta_1, elongation_rate_1, elongation_rate_2, V_b_2, C1, C2] = adder_init(data)
-    vi_1 = new_data[1:, new_data[0] == 'previous initiation size per ori (micron)']
-    vi_2 = new_data[1:, new_data[0] == 'initiation size per ori (micron)']
-    C_1 = new_data[1:, new_data[0] == 'initiation size per ori (micron)']
-    plt.subplot(121)
-    plt.plot(vi_1, taille_init_1, 'k.')
-    plt.subplot(122)
-    plt.plot(vi_2, taille_init_2, 'k.')
 
 def bootstrap_AND(data, author):
     param = []
@@ -1505,388 +1274,13 @@ def bootstrap_AND_witzdata(condi):
     return [stats.t.interval(0.95, N, loc=moy_kd, scale=std_kd), stats.t.interval(0.95, N, loc=moy_tetd, scale=std_tetd), stats.t.interval(0.95, N, loc=moy_kr, scale=std_kr), stats.t.interval(0.95, N, loc=moy_tetr, scale=std_tetr)]
     
 
-
-def figure_param_AND():
-    intervals = np.array([[1.3022661121185517, 1.3424740467826055, 0.14109930283469194, 0.1676311713120723, 1.1178709467531778, 1.1463950978566044, 0.1043909662067328, 0.1223398018948734],
-                         [1.7818449925228386, 1.8397551244642574, 0.1601011002465938, 0.18625401789084833, 0.8545928106562823, 0.883097363783361, 0.06933660963771715, 0.09649491049644598],
-                         [2.6784112805099696, 2.755728761035777, 0.1435453933064456, 0.17364191002862112, 0.6615124292903821, 0.9920342417163718, 0.08913580233516703, 0.30517523321547807],
-                         [1.678057232612733, 1.7343917049558675, 0.1484163793229019, 0.17432430223207654, 1.0047437812857343, 1.0451945921617707, 0.10276779227703542, 0.1389202812174354],
-                         [1.7767931036604314, 1.8454878482324029, 0.18583028585353853, 0.21959545050377685, 0.9408230200585168, 1.0027535633129288, 0.10851552730995466, 0.16871134327283743],
-                         [2.0461254614893924, 2.1665792373640294, 0.1960640233826516, 0.23564340549044882, 0.8025752343637292, 0.9416975380683078, 0.1020194738250333, 0.24629452096297927],
-                         [1.6739315323333068, 1.7260519498124136, 0.2294186014296905, 0.2641152265761888, 1.993914664541805, 2.069838948906083, 0.10760733321049788, 0.1300045552896389],
-                         [1.7562442333582382, 1.8426404998874641, 0.19908146709909239, 0.23826355732352525, 1.9825211796508297, 2.115104062907643, 0.07074631093658339, 0.11662376330299899],
-                         [1.2156764902806263, 1.2971706218567538, 0.20263603854361514, 0.26559315571763253, 4.619658175735606, 4.9965140105134305, 0.10172570785644344, 0.14864083801223885],
-                         [1.4846988516930009, 1.6242006130422002, 0.18448406737649792, 0.24579704781009248, 2.1177728344147893, 2.2960808082030333, 0.08541277279116705, 0.15543302084907085],
-                         [1.5807663428521261, 1.7088428461019747, 0.20749248070427753, 0.260103615995326, 1.8765074187808979, 2.0886820825994055, 0.08849712132774529, 0.15501562811256275],
-                         [1.5941851172651496, 1.7784322111970496, 0.16862871228557194, 0.25532717118157716, 1.871141503180914, 2.007664397918183, 0.07684573694539695, 0.14505776667721107],
-                         [1.4758137274022078, 1.5590411532603459, 0.17203531662345417, 0.20820132255352453, 1.8928871146448434, 2.0469804554258793, 0.0735755458614804, 0.13472678476278171],
-                         [2.420, 2.420, 0.2527, 0.2527, 1.335, 1.335, 0.0836, 0.0836],
-                         [2.218, 2.218, 0.2247, 0.2247, 0.973, 0.973, 0.1092, 0.1092],
-                         [1.959, 1.959, 0.2247, 0.2247, 0.560, 0.560,  0.6549, 0.6549]])
-                
-    values_tiru = np.array([[ 9.69902749,  0.2020749 ,  2.33069026, 14.43362032],
-                            [2.07974403e+01, 8.65949179e-02, 1.12011993e+02, 1.09789336e+00],
-                            [18.21114076,  0.06905488, 63.21287199,  4.56029993],
-                            [21.39801298,  0.07268744, 66.39136386,  1.99415171],
-                            [18.13097166,  0.09077569, 65.4763224 ,  1.81775068],
-                            [20.65947717,  0.0786411 ,  5.82205593, 15.61751369],
-                            [2.06595448e+01, 8.20581644e-02, 8.48252236e+01, 1.36801042e+00],
-                            [2.74502234e+01, 5.53589662e-02, 9.41896274e+01, 1.25228767e+00]])
-    # lamb_tiru = np.array([0.009358911696098057, 0.004345425858787236, 0.001258291609439082, 0.0034348571845039086, 0.006400949789333891, 0.004543517706457706, 0.008484348749358037, 0.004950545538596642])*60
-    # moy_d = values_tiru[:, 0]*values_tiru[:, 1]
-    # moy_r = values_tiru[:, 2]*values_tiru[:, 3]/60.
-    # CV = 1/np.sqrt(values_tiru[:, (0,2)])
-    mean_mean_d = (intervals[:,0] + intervals[:,1])/2.
-    yerr_mean_d = intervals[:,1] - mean_mean_d
-    mean_sd_d = (intervals[:,2] + intervals[:,3])/2.
-    yerr_sd_d = intervals[:,3] - mean_sd_d
-    mean_mean_r = (intervals[:,4] + intervals[:,5])/2.
-    yerr_mean_r = intervals[:,5] - mean_mean_r
-    mean_sd_r = (intervals[:,6] + intervals[:,7])/2.
-    yerr_sd_r = intervals[:,7] - mean_sd_r
-    #si_arg ; si_glu2 ; si_glu12aa ; witz_glycerol ; witz_glucose ; witz_glucose8a ; si_acet ; JM85_Gly ; STK13_Ace ; STK13_AlaTrE ; STK13_Glu ; STK13_GlyCas ; STK13_GlyTrE, si_gly11aa, si_glu1, JM85_GlyCas
-    moy_vb = [1.4815800117577897, 1.8966247206703908, 2.8237909836065573, 1.768093617044862, 1.832331581821893, 2.1946424075227076, 1.8831295366795366, 2.0375738095238094, 1.454992518703242, 1.7561255813953487, 1.795281853281853, 1.8969319999999998, 1.605688953488372, 2.675, 2.513, 2.079]
-    moy_vi = np.array([0.881173015873016, 0.7223439944134078, 0.5606602117486339, 1.0459187936602632, 0.8087191420791293, 0.8531903137713196, 1.0009863577863578, 0.9844142857142857, 0.884492518703242, 1.0151860465116278, 0.6899324324324324, 0.614518, 0.7534433139534884, 0.8865, 0.8157, 0.796]).T
-    mean_mean_d = mean_mean_d/moy_vi
-    yerr_mean_d = yerr_mean_d/moy_vi
-    lamb = np.array([0.4128127018462232, 0.9952708002084744, 1.4613584937475799, 0.44918875085717874, 0.6994869932999274, 0.9162697067419777, 0.2322446836830587, 0.26072555152723415, 0.07549749656634493, 0.20609143107023456, 0.3840569873600334, 0.509060924961482, 0.2970327323157985, 0.5666, 0.824, 0.5615])
-    #ml = np.mean(lamb)
-    #q = stats.t.ppf(1 - 0.05/2., df = np.size(lamb) - 2)
-    
-    L = np.linspace(0.01, 1.5, 50)
-    
-    reg_d = stats.linregress(x = lamb, y = np.log(mean_mean_d))
-    reg_r = stats.linregress(x = 1/lamb, y = mean_mean_r)
-    #array([['Ai_arg', 'si_glu2', 'si_glu12aa', 'witz_glycerol',
-           #  'witz_glucose', 'witz_glucose8a', 'si_acet', 'JM85_Gly',
-           #  'STK13_Ace', 'STK13_AlaTrE', 'STK13_Glu', 'STK13_GlyCas ',
-           #  'STK13_GlyTrE', 'si_gly11aa', 'si_glu1', 'JM85_GluCas',
-           #  'STK3_Gly'],
-           # ['0.4128127018462232', '0.9952708002084744', '1.4613584937475799',
-           #  '0.44918875085717874', '0.6994869932999274',
-           #  '0.9162697067419777', '0.2322446836830587',
-           #  '0.26072555152723415', '0.07549749656634493',
-           #  '0.20609143107023456', '0.3840569873600334', '0.509060924961482',
-           #  '0.2970327323157985', '0.5666359395441669', '0.8243963010658435',
-           #  '0.5615347017658835', '0.27261106238746236']], dtype='<U32')
-           
-    C = np.array([0.83, 0.614, 0.49, 0, 0, 0, 1.47, 1.51, 3.28, 1.58, 1.26, 1.05, 1.41, 1.24, 0.76, 0])
-    print(reg_d, reg_r)
-    pltreg_d = [np.exp(reg_d.slope*x + reg_d.intercept) for x in L]
-    pltreg_r = [reg_r.slope/x + reg_r.intercept for x in L]
-    
-    # int_reg_d_ub = [np.exp(reg_d.slope*x + reg_d.intercept + q*np.sqrt((x**2 - 2*x*ml)*reg_d.stderr**2 + reg_d.intercept_stderr**2)) for x in L]
-    # int_reg_d_lb = [np.exp(reg_d.slope*x + reg_d.intercept - q*np.sqrt((x**2 - 2*x*ml)*reg_d.stderr**2+ reg_d.intercept_stderr**2)) for x in L]
-    # int_reg_r_ub = [reg_r.slope/x + reg_r.intercept + q*np.sqrt((x**2 - 2*x*ml)*reg_r.stderr**2 + reg_r.intercept_stderr**2) for x in L]
-    # int_reg_r_lb = [reg_r.slope/x + reg_r.intercept - q*np.sqrt((x**2 - 2*x*ml)*reg_r.stderr**2 + reg_r.intercept_stderr**2) for x in L]
-    
-    reg_dsd = stats.linregress(x = lamb, y = mean_sd_d)
-    reg_rsd = stats.linregress(x = lamb, y = mean_sd_r)
-    
-    # pltreg_dsd = [reg_dsd.slope*x + reg_dsd.intercept for x in L]
-    # pltreg_rsd = [reg_rsd.slope*x + reg_rsd.intercept - 0.05 for x in L]
-    
-    pltreg_dsd = [np.mean(mean_sd_d) for x in L]
-    pltreg_rsd = [np.mean(mean_sd_r)-0.025 for x in L]
-    print(np.mean(mean_sd_d), np.mean(mean_sd_r)-0.025)
-    # int_reg_dsd_ub = [reg_dsd.slope*x + reg_dsd.intercept + q*np.sqrt((x**2 - 2*x*ml)*reg_dsd.stderr**2+ reg_dsd.intercept_stderr**2) for x in L]
-    # int_reg_dsd_lb = [reg_dsd.slope*x + reg_dsd.intercept - q*np.sqrt((x**2 - 2*x*ml)*reg_dsd.stderr**2 + reg_dsd.intercept_stderr**2) for x in L]
-    # int_reg_rsd_ub = [reg_rsd.slope*x + reg_rsd.intercept + q*np.sqrt((x**2 - 2*x*ml)*reg_rsd.stderr**2+ reg_rsd.intercept_stderr**2) for x in L]
-    # int_reg_rsd_lb = [reg_rsd.slope*x + reg_rsd.intercept - q*np.sqrt((x**2 - 2*x*ml)*reg_rsd.stderr**2 + reg_rsd.intercept_stderr**2) for x in L]
-    
-    
-    #     #C = ['darkcyan', 'slateblue', 'k']
-    #     C = ['mediumaquamarine', 'palevioletred', 'midnightblue']
-    plt.subplot(221)
-    #plt.fill_between(L, int_reg_d_lb, int_reg_d_ub, color = 'k', alpha = 0.1)
-    plt.plot(L, pltreg_d, 'k--')
-    plt.errorbar(lamb[:3], mean_mean_d[:3], yerr = yerr_mean_d[:3], ecolor = 'k', color = 'darkcyan', capsize=2,fmt='o', alpha = 1, label = 'NCM3722 (Si et al. (2019))')
-    plt.errorbar(lamb[3:6], mean_mean_d[3:6], yerr = yerr_mean_d[3:6], ecolor = 'k', color = 'slateblue', capsize=2,fmt='^', alpha = 1, label = 'BW27378 (Witz et al. (2019))')
-    plt.errorbar(lamb[6], mean_mean_d[6], yerr = yerr_mean_d[6], ecolor = 'k', color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1, label = 'MG1655 (Si et al. (2019))')
-    plt.errorbar(lamb[7], mean_mean_d[7], yerr = yerr_mean_d[7], ecolor = 'k', color = 'palevioletred', capsize=2,fmt='d', alpha = 1, label = 'JM85 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[8:13], mean_mean_d[8:13], yerr = yerr_mean_d[8:13], color = 'midnightblue', ecolor = 'k', capsize=2,fmt='v', alpha = 1, label = 'STK13 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[13:15], mean_mean_d[13:15], yerr = yerr_mean_d[13:15], ecolor = 'k',color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1)
-    plt.xlim(0, 1.5)
-    plt.ylabel('$\mathrm{E}[\Delta_d]/\mathrm{E}[\Delta_i]$')
-    plt.xlabel('$\mathrm{E}[\lambda]$')
-    plt.ylim(0,5.5)
-    plt.legend()
-    #plt.plot(lamb, moy_vb, 'k.')
-    #plt.yscale('log')
-    plt.subplot(222)
-    plt.plot(L, pltreg_r, 'k--')
-    plt.plot(L, np.array(pltreg_r)*0.75, 'k--')
-    #plt.fill_between(L, int_reg_r_lb, int_reg_r_ub, color = 'k', alpha = 0.1)
-    plt.errorbar(lamb[:3], mean_mean_r[:3], yerr = yerr_mean_r[:3], ecolor = 'k', color = 'darkcyan', capsize=2,fmt='o', alpha = 1, label = 'NCM3722 (Si et al. (2019))')
-    plt.errorbar(lamb[3:6], mean_mean_r[3:6], yerr = yerr_mean_r[3:6], ecolor = 'k',color = 'slateblue', capsize=2,fmt='^', alpha = 1, label = 'BW27378 (Witz et al. (2019))')
-    plt.errorbar(lamb[6], mean_mean_r[6], yerr = yerr_mean_r[6], ecolor = 'k',color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1, label = 'MG1655 (Si et al. (2019))')
-    plt.errorbar(lamb[7], mean_mean_r[7], yerr = yerr_mean_r[7], ecolor = 'k',color = 'palevioletred', capsize=2,fmt='d', alpha = 1, label = 'JM85 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[8:13], mean_mean_r[8:13], yerr = yerr_mean_r[8:13], ecolor = 'k',color = 'midnightblue', capsize=2,fmt='v', alpha = 1, label = 'STK13 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[13:15], mean_mean_r[13:15], yerr = yerr_mean_r[13:15], ecolor = 'k',color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1)
-    plt.plot(lamb, C, 'k.')
-    plt.ylim(0,5.5)
-    plt.xlim(0, 1.5)
-    plt.ylabel('$\mathrm{E}[R]$')
-    plt.xlabel('$\mathrm{E}[\lambda]$')
-    plt.subplot(223)
-    plt.plot(L, pltreg_dsd, 'k--')
-    #plt.fill_between(L, int_reg_dsd_lb, int_reg_dsd_ub, color = 'k', alpha = 0.1)
-    plt.errorbar(lamb[:3], mean_sd_d[:3], yerr = yerr_sd_d[:3], ecolor = 'k',color = 'darkcyan', capsize=2,fmt='o', alpha = 1, label = 'NCM3722 (Si et al. (2019))')
-    plt.errorbar(lamb[3:6], mean_sd_d[3:6], yerr = yerr_sd_d[3:6], ecolor = 'k',color = 'slateblue', capsize=2,fmt='^', alpha = 1, label = 'BW27378 (Witz et al. (2019))')
-    plt.errorbar(lamb[6], mean_sd_d[6], yerr = yerr_sd_d[6], ecolor = 'k',color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1, label = 'MG1655 (Si et al. (2019))')
-    plt.errorbar(lamb[7], mean_sd_d[7], yerr = yerr_sd_d[7], ecolor = 'k',color = 'palevioletred', capsize=2,fmt='d', alpha = 1, label = 'JM85 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[8:13], mean_sd_d[8:13], yerr = yerr_sd_d[8:13], ecolor = 'k',color = 'midnightblue', capsize=2,fmt='v', alpha = 1, label = 'STK13 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[13:15], mean_sd_d[13:15], yerr = yerr_sd_d[13:15], ecolor = 'k',color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1)
-    plt.ylabel('$CV(\Delta_d)$')
-    plt.xlabel('$\mathrm{E}[\lambda]$')
-    plt.xlim(0, 1.5)
-    plt.ylim(0,0.4)
-    plt.subplot(224)
-    plt.plot(L, pltreg_rsd, 'k--')
-    #plt.fill_between(L, int_reg_rsd_lb, int_reg_rsd_ub, color = 'k', alpha = 0.1)
-    plt.errorbar(lamb[:3], mean_sd_r[:3], yerr = yerr_sd_r[:3], ecolor = 'k',color = 'darkcyan', capsize=2,fmt='o', alpha = 1, label = 'NCM3722 (Si et al. (2019))')
-    plt.errorbar(lamb[3:6], mean_sd_r[3:6], yerr = yerr_sd_r[3:6], ecolor = 'k',color = 'slateblue', capsize=2,fmt='^', alpha = 1, label = 'BW27378 (Witz et al. (2019))')
-    plt.errorbar(lamb[6], mean_sd_r[6], yerr = yerr_sd_r[6], ecolor = 'k',color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1, label = 'MG1655 (Si et al. (2019))')
-    plt.errorbar(lamb[7], mean_sd_r[7], yerr = yerr_sd_r[7], ecolor = 'k',color = 'palevioletred', capsize=2,fmt='d', alpha = 1, label = 'JM85 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[8:13], mean_sd_r[8:13], yerr = yerr_sd_r[8:13], ecolor = 'k',color = 'midnightblue', capsize=2,fmt='v', alpha = 1, label = 'STK13 (Tiruvardi et al. (2022))')
-    plt.errorbar(lamb[13:15], mean_sd_r[13:15], yerr = yerr_sd_r[13:15], ecolor = 'k',color = 'mediumaquamarine', capsize=2,fmt='D', alpha = 1)
-    plt.ylabel('$CV(R)$')
-    plt.xlabel('$\mathrm{E}[\lambda]$')
-    plt.xlim(0, 1.5)
-    plt.ylim(0,0.4)
-    
-def Ho_Amir_vs_data():
-    moy_vb = np.array([1.4815800117577897, 1.8966247206703908, 2.8237909836065573, 1.768093617044862, 1.832331581821893, 2.1946424075227076, 1.8831295366795366, 2.0375738095238094, 1.454992518703242, 1.7561255813953487, 1.795281853281853, 1.8969319999999998, 1.605688953488372, 2.675, 2.513, 2.079])
-    moy_vi = np.array([0.881173015873016, 0.7223439944134078, 0.5606602117486339, 1.0459187936602632, 0.8087191420791293, 0.8531903137713196, 1.0009863577863578, 0.9844142857142857, 0.884492518703242, 1.0151860465116278, 0.6899324324324324, 0.614518, 0.7534433139534884, 0.8865, 0.8157, 0.796])
-    lamb = np.array([0.4128127018462232, 0.9952708002084744, 1.4613584937475799, 0.44918875085717874, 0.6994869932999274, 0.9162697067419777, 0.2322446836830587, 0.26072555152723415, 0.07549749656634493, 0.20609143107023456, 0.3840569873600334, 0.509060924961482, 0.2970327323157985, 0.5666, 0.824, 0.5615])
-    L = np.linspace(0, 1.5, 10)
-    Y = [np.exp(l*0.63 + 0.32) for l in L]
-    Y2 = [1.44*np.exp(l*0.75) for l in L]
-    plt.plot(L, Y, 'b')
-    plt.plot(L, Y2, 'r')
-    plt.plot(lamb, moy_vb/moy_vi, 'k.')
-
-#si_ecet, si_gly_11, si_glu1, si_arg, si_glu2, si_glu12, witz_gly, witz_glu, witz_glu8a, JM_gly, STK_Ace, STK_AlaTrE, STK_Glu, STK_Gly, STK_GlyCas, STK_GlyTrE
-def figure_revolution():
-    results_revolution = np.array([[5.13916503e+00, 2.54332218e-01, 5.60879433e+01, 1.37183669e-02],
-                                [1.21084247e+01, 1.91411023e-01, 3.74473631e+01, 3.54528331e-02],
-                                [29.27786759,  0.07043376, 11.50170366,  0.10986727],
-                                [3.39336431e+01, 3.77914690e-02, 2.94464792e+01, 1.83660889e-02],
-                                [2.97563182e+01, 6.05761369e-02, 5.39607447e+01, 1.87324221e-02],
-                                [2.74733371e+01, 9.93658909e-02, 6.85951167e+01, 2.65701542e-02],
-                                [3.62535682e+01, 4.31586443e-02, 2.61313295e+01, 2.67508472e-02],
-                                [25.03300955,  0.07371695,  9.06605515,  0.08010155],
-                                [15.14885435,  0.14116241, 24.28599836,  0.04541261],
-                                [1.29214891e+01, 1.15232477e-01, 3.49764850e+01, 2.56463677e-02],
-                                [23.435896  ,  0.04282502, 17.2995496 ,  0.02860124],
-                                [4.66594902e+02, 2.30515159e-03, 3.03804181e+01, 2.34601411e-02],
-                                [12.13905006,  0.12330363, 25.16389612,  0.03784704],
-                                [15.93342394,  0.09089565, 10.03749263,  0.07110012],
-                                [1.22214329e+01, 1.60151100e-01, 3.95993498e+01, 2.09878429e-02],
-                                [4.11576538e+01, 3.13745464e-02, 3.12683071e+01, 2.53469217e-02]])
-    lamb = [0.232, 0.5666, 0.824, 0.4128, 0.995, 1.461, 0.449, 0.699, 0.9162, 0.2607, 0.0754, 0.20609, 0.3840, 0.272, 0.509, 0.297]
-    #si_arg ; si_glu2 ; si_glu12aa ; witz_glycerol ; witz_glucose ; witz_glucose8a ; si_acet ; JM85_Gly ; STK13_Ace ; STK13_AlaTrE ; STK13_Glu ; STK13_GlyCas ; STK13_GlyTrE, si_gly11aa, si_glu1, JM85_GlyCas
-  
-    moy_vi = np.array([1.001, 0.8865, 0.8157, 0.881, 0.722, 0.560, 1.045, 0.809, 0.853, 0.984, 0.8844, 1.015, 0.6899, 0.872, 0.614, 0.7534]).T
-    mean_d = results_revolution[:,0]*results_revolution[:,1]/moy_vi
-    mean_id = results_revolution[:,2]*results_revolution[:,3]/moy_vi
-    CV_d = 1/np.sqrt(results_revolution[:,0])
-    CV_id = 1/np.sqrt(results_revolution[:,2])
-    plt.subplot(221)
-    plt.plot(lamb, mean_d,'k.')
-    plt.subplot(222)
-    plt.plot(lamb, mean_id,'k.')
-    plt.subplot(223)
-    plt.plot(lamb, CV_d,'k.')
-    plt.subplot(224)
-    plt.plot(lamb, CV_id,'k.')
     
 
-def point_fixe_gamma_gen(Delta_i, Lx, Nx):
-    dx = Lx/Nx
-    a,c,_,scale = stats.gengamma.fit(Delta_i, floc = 0)
-    print(a, c, scale)
-    Nx = int(Lx/dx)
-    Vx = np.linspace(dx, Lx+dx, Nx)
-    grid = 2*np.tile(Vx, (Nx, 1)) - np.tile(Vx, (Nx, 1)).T
-    f_old = stats.gengamma.pdf(Vx,a = a,c = c,scale = scale)
-    Convo = np.reshape(stats.gengamma.pdf(grid.flatten(),a = a, c = c ,scale = scale), (Nx,Nx))
-    epsilon = 1
-    while epsilon > 0.0001:
-        f = 2*dx*f_old@Convo
-        epsilon = np.sum((f-f_old)**2)/float(Nx)
-        f_old = np.copy(f) 
-    return f_old
-
-def point_fixe_non_param(Delta, Lx, Nx):
-    densite_Delta = stats.gaussian_kde(Delta, 'scott')
-    dx = Lx/Nx
-    Vx1 = np.linspace(dx, Lx, Nx)
-    Vx2 = np.linspace(0, Lx+dx, Nx+2)
-    renorm = np.sum(densite_Delta(Vx2)*dx)
-    grid = 2*np.tile(Vx1, (Nx, 1)) - np.tile(Vx1, (Nx, 1)).T
-    P = 2*dx*np.reshape(densite_Delta(grid.flatten()), (Nx,Nx))*np.where((grid <= Nx+1)&(grid >=0), 1, 0)/renorm
-    _,V = sparse.linalg.eigs(P.T, k=1, which='LM')
-    Vren = np.abs(V)/(dx*np.sum(np.abs(V)))
-    #print(P@np.ones(Nx))
-    plt.plot(Vx1, Vren)
-    #return Vren.T[0]
-    
-def point_fixe_non_param_data(data, author, Nx):
-    [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(data, author)
-    V = V.flatten().astype(float)
-    Delta_app = Delta_app.flatten().astype(float)
-    Lx = 3*np.mean(V)
-    Delta = Delta_app
-    densite_Delta = stats.gaussian_kde(Delta, 'scott')
-    desnite_Vb = stats.gaussian_kde(V, 'scott')
-    dx = Lx/Nx
-    Vx1 = np.linspace(dx, Lx, Nx)
-    Vx2 = np.linspace(0, Lx+dx, Nx+2)
-    renorm = np.sum(densite_Delta(Vx2)*dx)
-    grid = 2*np.tile(Vx1, (Nx, 1)) - np.tile(Vx1, (Nx, 1)).T
-    P = 2*dx*np.reshape(densite_Delta(grid.flatten()), (Nx,Nx))*np.where((grid <= Nx+1)&(grid >=0), 1, 0)/renorm
-    _,V = sparse.linalg.eigs(P.T, k=1, which='LM')
-    Vren = np.abs(V)/(dx*np.sum(np.abs(V)))
-    #print(P@np.ones(Nx))
-    plt.plot(Vx1, desnite_Vb(Vx1), 'k')
-    plt.plot(Vx1, Vren, 'c')
-    #return Vren.T[0]
-
-
-def estim_proba_anucleated(data_or_cdt, author, Lx, Nx):
-    [v, V, v_tild, C, lamb] = extract_donnees2(data_or_cdt, author)
-    lamb = calcul_taux_el(data_or_cdt, author)
-    C = C.flatten()
-    v_tild = v_tild.flatten()
-    X = v_tild*np.exp(lamb*C)
-    plt.hist(X, [0.05*x for x in range(100)], density = True, color = 'k', alpha = 0.2)
-    I = adder_init(data_or_cdt)
-    dx = Lx/float(Nx)
-    Vx = np.linspace(dx, Lx, Nx)
-    Delta_i = I[1] - I[0]/2.
-    Delta_i = Delta_i.astype(float)
-    Delta_d = V - v
-    Delta_d = Delta_d.flatten()
-    densite_Vi = point_fixe_non_param(Delta_i, Lx, Nx)
-    densite_Vb = point_fixe_non_param(Delta_d, Lx, Nx)
-    
-    densite_C = stats.gaussian_kde(C)
-    renorm = quad(densite_C, 0, -np.log(dx)/lamb)[0]
-    print(renorm)
-    densite_ViexplambC = [0]
-    for k in range(1, Nx):
-        arg = 0
-        for j in range(1, Nx):
-            arg = arg + densite_Vi[j]*densite_C(np.log(k/float(j))/lamb)/(lamb*k)/renorm
-        densite_ViexplambC.append(arg[0])
-    densite_ViexplambC = np.array(densite_ViexplambC)
-    densite_ViexplambC = densite_ViexplambC/(np.sum(densite_ViexplambC)*dx)
-    
-    F_Vb = np.cumsum(densite_Vb) - densite_Vb/2.
-    proba = np.sum(densite_ViexplambC*(F_Vb)*dx*dx)
-    plt.plot(Vx, densite_Vb, 'slateblue')
-    plt.plot(Vx, densite_ViexplambC, 'darkcyan')
-    plt.xlim(0, np.mean(v)+np.mean(v_tild*np.exp(lamb*C)))
-    return proba
-    
-def estim_proba_Tbdecroiss(data_or_cdt, author, Lx, Nx):
-    [Delta_id, Delta_i] = extract_donnees3(data_or_cdt, author)
-    Delta_id = Delta_id.flatten()
-    Delta_i = Delta_i.flatten().astype(float)
-    dx = Lx/float(Nx)
-    Vx = np.linspace(dx, Lx, Nx)
-    densite_Did = stats.gaussian_kde(Delta_id)
-    densite_Di = stats.gaussian_kde(Delta_i)
-    F_Did = np.cumsum(densite_Did(Vx)) - densite_Did(Vx)/2.
-    densite_2DidplusDi = np.array([np.sum(densite_Did(Vx)*densite_Di(Vx[x] - 2*Vx))*dx for x in range(Nx)])
-    proba = np.sum(densite_2DidplusDi*F_Did*dx*dx)
-    plt.plot(Vx, densite_2DidplusDi, 'mediumaquamarine')
-    plt.plot(Vx, densite_Did(Vx), 'midnightblue')
-    plt.xlim(0, np.mean(Delta_id) + 1.5*np.mean(2*Delta_id + Delta_i))
-    plt.ylim(0, 1.1*np.max(densite_Did(Vx)))
-    return 1 - proba
-
-def estim_proba_Tbdecroiss_empir(data_or_cdt, author):
-    [Delta_id, Delta_i] = extract_donnees3(data_or_cdt, author)
-    Delta_id = Delta_id.flatten().astype(float)
-    Delta_i = Delta_i.flatten().astype(float)
-    cpt = 0
-    N_id = np.size(Delta_id)
-    N_i = np.size(Delta_i)
-    for d_id1 in Delta_id:
-        for d_id2 in Delta_id:
-            for d_i in Delta_i:
-                if 2*d_id1 + d_i < d_id2:
-                    cpt += 1
-    return [cpt/(N_id*N_id*N_i), N_id, N_i]
-
-
-    
-def test_point_fixe_si(data, L, N):
-    v_t = data[1:, data[0] == 'initiation size per ori (micron)'].astype(float).flatten()/2.
-    I = adder_init(data)
-    Delta_i = I[1] - I[0]/2.
-    Delta_i = Delta_i.astype(float)
-    densite_vtild = stats.gaussian_kde(v_t, 'scott')
-    moy_i = np.mean(Delta_i)
-    Vx = np.linspace(0, 2*moy_i, N)
-    densite_vtild_non_param = point_fixe_gamma_gen(Delta_i, 2*moy_i, N)
-    plt.plot(Vx, densite_vtild(Vx), 'k')
-    plt.plot(Vx, densite_vtild_non_param, 'b')
     
 
 
-def estim_param_AND_exp(data_or_cdt, author):
-    [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(data_or_cdt, author)
-    def f(X):
-        [lamb_d, k_r, tet_r] = X
-        return - np.sum(np.log(2*stats.expon.pdf(Delta_app, loc = 0, scale = lamb_d)*stats.gamma.cdf(R_app, a = k_r, scale = tet_r) + stats.expon.cdf(Delta_app, loc = 0, scale = lamb_d)*stats.gamma.pdf(R_app, a = k_r, scale = tet_r)/(lamb*V)))
-    moy_d = np.mean(Delta_app)
-    moy_r = np.mean(R_app)
-    var_r = np.var(R_app)
-    X0 = [moy_d, moy_r**2/var_r, var_r/moy_r]
-    results = minimize(f, X0, method = 'Nelder-Mead')
-    return [results.x, results.success, results.message, -results.fun]
-
-def test_estim_param_AND_exp(data_or_cdt, author):
-    [v, v_tild, V, Delta_app, R_app, lamb] = extract_donnees(data_or_cdt, author)
-    E_Dd = np.mean(Delta_app)
-    E_R= np.mean(R_app)
-    results = estim_param_AND_exp(data_or_cdt, author)
-    print(results)
-    [lamb_d, k_r, tet_r] = results[0]
-    A = np.linspace(0, E_Dd*3, 100)
-    R = np.linspace(0, E_R*3, 100)
-    f_delta_app = []
-    for dd in A:
-        f_delta_app.append(np.mean(stats.expon.pdf(dd, loc = 0, scale = lamb_d)*stats.gamma.cdf(R_app + np.log((v + dd)/(2*V))/lamb, a = k_r, scale = tet_r) + stats.expon.cdf(dd, loc = 0, scale = lamb_d)*stats.gamma.pdf(R_app + np.log((v + dd)/(2*V))/lamb, a = k_r, scale = tet_r)/(lamb*(v + dd))))
-    f_r_app = []
-    for rr in R:
-        aa = 2*v_tild*np.exp(lamb*rr)
-        f_r_app.append(np.mean(aa*lamb*stats.expon.pdf(aa - v, loc = 0, scale = lamb_d)*stats.gamma.cdf(rr, a = k_r, scale = tet_r) + stats.expon.cdf(aa - v, loc = 0, scale = lamb_d)*stats.gamma.pdf(rr, a = k_r, scale = tet_r)))
-    plt.subplot(211)
-    plt.hist(Delta_app, [3*k*E_Dd/50. for k in range(50)], color = 'k', density = True)
-    plt.plot(A, f_delta_app, 'c', label = '$\Delta_{app}$')
-    plt.plot(A, stats.expon.pdf(A, loc = 0, scale = lamb_d), 'r', label = '$\Delta_d$')
-    plt.legend()
-    plt.ylabel('$Density$')
-    plt.xlabel('$Added$ $size$ ($\mu m$)')
-    plt.subplot(212)
-    plt.hist(R_app, [3*k*E_R/50. for k in range(50)], color = 'k', density = True)
-    plt.plot(R, f_r_app, 'c', label = '$R_{app}$')
-    plt.plot(R, stats.gamma.pdf(R, a = k_r, scale = tet_r), 'r', label = '$R$')
-    plt.legend()
-    plt.ylabel('$Density$')
-    plt.xlabel('$C+D$ $period$ ($h$)')
 
 
-def test_betavsnormale(alpha, k, scale):
-    X = stats.gamma.rvs(a=k, scale = scale, size = 1000000)
-    A = stats.beta.rvs(alpha, alpha, size = 1000000)
-    C = stats.norm.rvs(0, (1+1/k)*(k*scale)**2/(4*(2*alpha +1)), size = 1000000)
-    plt.hist(X/2. + C, [2*k*scale*i/100 for i in range(100)], alpha= 0.5)
-    plt.hist(X*A, [2*k*scale*i/100 for i in range(100)], alpha= 0.5)
    
 
 
