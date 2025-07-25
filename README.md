@@ -9,4 +9,13 @@ Witz G, van Nimwegen E, Julou T. Initiation of chromosome replication controls 3
 
 Tiruvadi-Krishnan S, M ̈annik J, Kar P, Lin J, Amir A, M ̈annik J. Coupling 412 between DNA replication, segregation, and the onset of constriction in 413 Escherichia coli. Cell reports. 2022;38(12):110539. https://data.mendeley.com/datasets/hwzcywscc4/draft?a=d486eddf-c4c6-40ee-b262-913f79e5d47b
 
-In the notebook are gathered the codes used for the paper.
+In the notebook are gathered the codes used for the paper 'Deciphering the Replication-Division Coordination in E. coli: A Unified Mathematical framework for Systematic Model Comparison'.
+
+The notebook is segmented in 7 sections:
+1. Data extraction
+2. Preliminary analysis
+3. Parameters estimation
+4. Results of the Parameters estimation
+5. Wasserstein distances computation
+6. Simulation of CAM under oscillating expression of DnaA
+7. Estimation of one-origin cell division probability in DIAM
