@@ -14,8 +14,9 @@ In the notebook are gathered the codes used for the paper 'Deciphering the Repli
 The notebook is segmented in 7 sections:
 1. Data extraction
 2. Preliminary analysis
-3. Parameters estimation
-4. Results of the Parameters estimation
-5. Wasserstein distances computation
-6. Simulation of CAM under oscillating expression of DnaA
-7. Estimation of one-origin cell division probability in DIAM
+3. Auxiliary functions
+4. Parameters estimation
+5. Results of the Parameters estimation
+6. Wasserstein distances computation
+7. Simulation of the CAM under oscillating expression of DnaA
+8. Estimation of one-origin cell division probability in the DIAM
