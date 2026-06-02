@@ -11,12 +11,13 @@ Tiruvadi-Krishnan S, Männik J, Kar P, Lin J, Amir A, Männik J. Coupling betwee
 
 In the notebook are gathered the codes used for the paper 'Deciphering the Replication-Division Coordination in E. coli: A Unified Mathematical framework for Systematic Model Comparison'.
 
-The notebook is segmented in 7 sections:
+The notebook is segmented in 9 sections:
 1. Data extraction
 2. Preliminary analysis
 3. Auxiliary functions
 4. Parameters estimation
 5. Results of the Parameters estimation
 6. Wasserstein distances computation
-7. Simulation of the CAM under oscillating expression of DnaA
+7. Simulation of the models under oscillating expression of DnaA
 8. Estimation of one-origin cell division probability in the DIAM
+9. Evaluation of the effect of the symmetric division assumption of distribution estimation and model comparison
