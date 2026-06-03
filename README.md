@@ -1,5 +1,7 @@
 # Coordination-division-replication-E.coli
 
+Here we provide the data and the codes used in the paper 'Deciphering the Replication-Division Coordination in E. coli: A Unified Mathematical framework for Systematic Model Comparison'
+
 In the Experimental_data folder are stored the datasets used for the study. 
 The datasets come from the following publications
 
@@ -9,7 +11,7 @@ Witz G, van Nimwegen E, Julou T. Initiation of chromosome replication controls b
 
 Tiruvadi-Krishnan S, Männik J, Kar P, Lin J, Amir A, Männik J. Coupling between DNA replication, segregation, and the onset of constriction in Escherichia coli. Cell reports. 2022;38(12):110539. https://data.mendeley.com/datasets/hwzcywscc4/draft?a=d486eddf-c4c6-40ee-b262-913f79e5d47b
 
-In the notebook are gathered the codes used for the paper 'Deciphering the Replication-Division Coordination in E. coli: A Unified Mathematical framework for Systematic Model Comparison'.
+In the notebook are gathered the codes used for the study.
 
 The notebook is segmented in 9 sections:
 1. Data extraction
@@ -20,4 +22,4 @@ The notebook is segmented in 9 sections:
 6. Wasserstein distances computation
 7. Simulation of the models under oscillating expression of DnaA
 8. Estimation of one-origin cell division probability in the DIAM
-9. Evaluation of the effect of the symmetric division assumption of distribution estimation and model comparison
+9. Evaluation of the effect of the symmetric division assumption on distribution estimation and model comparison
