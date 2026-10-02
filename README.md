@@ -11,6 +11,8 @@ Witz G, van Nimwegen E, Julou T. Initiation of chromosome replication controls b
 
 Tiruvadi-Krishnan S, Männik J, Kar P, Lin J, Amir A, Männik J. Coupling between DNA replication, segregation, and the onset of constriction in Escherichia coli. Cell reports. 2022;38(12):110539. https://data.mendeley.com/datasets/hwzcywscc4/draft?a=d486eddf-c4c6-40ee-b262-913f79e5d47b
 
+Colin A, Micali G, Faure L, Cosentino Lagomarsino M, van Teeffelen S (2021) Two different cell-cycle processes determine the timing of cell division in Escherichia coli. Elife. 2021;10:e67495. https://elifesciences.org/articles/67495/figures#supp1
+
 In the notebook are gathered the codes used for the study.
 
 The notebook is segmented in 9 sections:
@@ -22,4 +24,5 @@ The notebook is segmented in 9 sections:
 6. Wasserstein distances computation
 7. Simulation of the models under oscillating expression of DnaA
 8. Estimation of one-origin cell division probability in the DIAM
-9. Evaluation of the effect of the symmetric division assumption on distribution estimation and model comparison
+9. Perturbations Colin et al. (2021)
+10. Evaluation of the effect of the symmetric division assumption on distribution estimation and model comparison
